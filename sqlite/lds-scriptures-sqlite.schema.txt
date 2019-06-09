@@ -1,0 +1,30 @@
+CREATE TABLE books (
+	id INTEGER PRIMARY KEY,
+	volume_id INTEGER REFERENCES volumes(id) ON DELETE CASCADE,
+	book_title TEXT,
+	book_long_title TEXT,
+	book_subtitle TEXT,
+	book_short_title TEXT,
+	book_lds_url TEXT
+);
+CREATE TABLE chapters (
+	id INTEGER PRIMARY KEY,
+	book_id INTEGER REFERENCES books(id) ON DELETE CASCADE,
+	chapter_number INTEGER
+);
+CREATE TABLE verses (
+	id INTEGER PRIMARY KEY,
+	chapter_id INTEGER REFERENCES chapters(id) ON DELETE CASCADE,
+	verse_number INTEGER,
+	scripture_text TEXT
+);
+CREATE TABLE volumes (
+	id INTEGER PRIMARY KEY,
+	volume_title TEXT,
+	volume_long_title TEXT,
+	volume_subtitle TEXT,
+	volume_short_title TEXT,
+	volume_lds_url TEXT
+);
+CREATE VIEW scriptures AS SELECT volumes.id AS volume_id, books.id AS book_id, chapters.id AS chapter_id, verses.id AS verse_id, volume_title, book_title, volume_long_title, book_long_title, volume_subtitle, book_subtitle, volume_short_title, book_short_title, volume_lds_url, book_lds_url, chapter_number, verse_number, scripture_text, book_title || ' ' || chapter_number || ':' || verse_number AS verse_title, book_short_title || ' ' || chapter_number || ':' || verse_number AS verse_short_title FROM volumes INNER JOIN books ON books.volume_id = volumes.id INNER JOIN chapters ON chapters.book_id = books.id INNER JOIN verses ON verses.chapter_id = chapters.id ORDER BY volumes.id, books.id, chapters.id, verses.id
+/* scriptures(volume_id,book_id,chapter_id,verse_id,volume_title,book_title,volume_long_title,book_long_title,volume_subtitle,book_subtitle,volume_short_title,book_short_title,volume_lds_url,book_lds_url,chapter_number,verse_number,scripture_text,verse_title,verse_short_title) */;
