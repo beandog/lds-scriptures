@@ -1,0 +1,208 @@
+--
+-- PostgreSQL database dump
+--
+
+SET statement_timeout = 0;
+SET lock_timeout = 0;
+SET client_encoding = 'UTF8';
+SET standard_conforming_strings = on;
+SET check_function_bodies = false;
+SET client_min_messages = warning;
+
+--
+-- Name: scriptures; Type: DATABASE; Schema: -; Owner: -
+--
+
+CREATE DATABASE scriptures WITH TEMPLATE = template0 ENCODING = 'UTF8' LC_COLLATE = 'en_US.UTF-8' LC_CTYPE = 'en_US.UTF-8';
+
+
+\connect scriptures
+
+SET statement_timeout = 0;
+SET lock_timeout = 0;
+SET client_encoding = 'UTF8';
+SET standard_conforming_strings = on;
+SET check_function_bodies = false;
+SET client_min_messages = warning;
+
+--
+-- Name: plpgsql; Type: EXTENSION; Schema: -; Owner: -
+--
+
+CREATE EXTENSION IF NOT EXISTS plpgsql WITH SCHEMA pg_catalog;
+
+
+--
+-- Name: EXTENSION plpgsql; Type: COMMENT; Schema: -; Owner: -
+--
+
+COMMENT ON EXTENSION plpgsql IS 'PL/pgSQL procedural language';
+
+
+SET search_path = public, pg_catalog;
+
+SET default_tablespace = '';
+
+SET default_with_oids = false;
+
+--
+-- Name: books; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE books (
+    id integer NOT NULL,
+    volume_id smallint NOT NULL,
+    book_title character varying(22) DEFAULT ''::character varying NOT NULL,
+    book_long_title character varying(59) DEFAULT ''::character varying NOT NULL,
+    book_subtitle character varying(80) DEFAULT ''::character varying NOT NULL,
+    book_short_title character varying(8) DEFAULT ''::character varying NOT NULL,
+    book_lds_url character varying(6) DEFAULT ''::character varying NOT NULL
+);
+
+
+--
+-- Name: chapters; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE chapters (
+    id integer NOT NULL,
+    book_id integer NOT NULL,
+    chapter_number smallint NOT NULL
+);
+
+
+--
+-- Name: verses; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE verses (
+    id integer NOT NULL,
+    chapter_id smallint NOT NULL,
+    verse_number smallint NOT NULL,
+    scripture_text text DEFAULT ''::text NOT NULL
+);
+
+
+--
+-- Name: volumes; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE volumes (
+    id integer NOT NULL,
+    volume_title character varying(22) DEFAULT ''::character varying NOT NULL,
+    volume_long_title character varying(26) DEFAULT ''::character varying NOT NULL,
+    volume_subtitle character varying(36) DEFAULT ''::character varying NOT NULL,
+    volume_short_title character varying(3) DEFAULT ''::character varying NOT NULL,
+    volume_lds_url character varying(15) DEFAULT ''::character varying NOT NULL
+);
+
+
+--
+-- Name: scriptures; Type: VIEW; Schema: public; Owner: -
+--
+
+CREATE VIEW scriptures AS
+ SELECT volumes.id AS volume_id,
+    books.id AS book_id,
+    chapters.id AS chapter_id,
+    verses.id AS verse_id,
+    volumes.volume_title,
+    books.book_title,
+    volumes.volume_long_title,
+    books.book_long_title,
+    volumes.volume_subtitle,
+    books.book_subtitle,
+    volumes.volume_short_title,
+    books.book_short_title,
+    volumes.volume_lds_url,
+    books.book_lds_url,
+    chapters.chapter_number,
+    verses.verse_number,
+    verses.scripture_text,
+    concat(books.book_title, ' ', chapters.chapter_number, ':', verses.verse_number) AS verse_title,
+    concat(books.book_short_title, ' ', chapters.chapter_number, ':', verses.verse_number) AS verse_short_title
+   FROM (((volumes
+     JOIN books ON ((books.volume_id = volumes.id)))
+     JOIN chapters ON ((chapters.book_id = books.id)))
+     JOIN verses ON ((verses.chapter_id = chapters.id)))
+  ORDER BY volumes.id, books.id, chapters.id, verses.id;
+
+
+--
+-- Name: pkey_books; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY books
+    ADD CONSTRAINT pkey_books PRIMARY KEY (id);
+
+ALTER TABLE books CLUSTER ON pkey_books;
+
+
+--
+-- Name: pkey_chapters; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY chapters
+    ADD CONSTRAINT pkey_chapters PRIMARY KEY (id);
+
+ALTER TABLE chapters CLUSTER ON pkey_chapters;
+
+
+--
+-- Name: pkey_verses; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY verses
+    ADD CONSTRAINT pkey_verses PRIMARY KEY (id);
+
+ALTER TABLE verses CLUSTER ON pkey_verses;
+
+
+--
+-- Name: pkey_volumes; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY volumes
+    ADD CONSTRAINT pkey_volumes PRIMARY KEY (id);
+
+ALTER TABLE volumes CLUSTER ON pkey_volumes;
+
+
+--
+-- Name: fkey_books_volumes; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY books
+    ADD CONSTRAINT fkey_books_volumes FOREIGN KEY (volume_id) REFERENCES volumes(id) ON DELETE CASCADE;
+
+
+--
+-- Name: fkey_chapters_books; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY chapters
+    ADD CONSTRAINT fkey_chapters_books FOREIGN KEY (book_id) REFERENCES books(id) ON DELETE CASCADE;
+
+
+--
+-- Name: fkey_verses_chapter; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY verses
+    ADD CONSTRAINT fkey_verses_chapter FOREIGN KEY (chapter_id) REFERENCES chapters(id) ON DELETE CASCADE;
+
+
+--
+-- Name: public; Type: ACL; Schema: -; Owner: -
+--
+
+REVOKE ALL ON SCHEMA public FROM PUBLIC;
+REVOKE ALL ON SCHEMA public FROM postgres;
+GRANT ALL ON SCHEMA public TO postgres;
+GRANT ALL ON SCHEMA public TO PUBLIC;
+
+
+--
+-- PostgreSQL database dump complete
+--
+
