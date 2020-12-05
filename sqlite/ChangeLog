@@ -1,0 +1,12 @@
+# 2020-12-05 - The book subtitles for 3 Nephi and 4 Nephi had newlines in it,
+# replace them with commas.
+
+UPDATE books SET book_subtitle = 'The Book of Nephi, the Son of Nephi, who was the Son of Helaman' WHERE id = 77;
+UPDATE books SET book_subtitle = 'The Book of Nephi, who is the son of Nephi, one of the disciples of Jesus Christ' WHERE id = 78;
+
+# 2020-09-18 - The database import originally converted the character 'æ' to
+# from the initial export to the HTML value '&aelig'. Same for uppercase. These
+# queries fix it so it simply 'ae' and 'Ae'
+
+UPDATE verses SET scripture_text = REPLACE(scripture_text, '&aelig;', 'ae') WHERE scripture_text LIKE '%&%';
+UPDATE verses SET scripture_text = REPLACE(scripture_text, '&Aelig;', 'Ae') WHERE scripture_text LIKE '%&%';
