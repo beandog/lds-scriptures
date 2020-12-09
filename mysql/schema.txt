@@ -1,0 +1,149 @@
+-- MySQL dump 10.13  Distrib 5.7.30, for Linux (x86_64)
+--
+-- Host: localhost    Database: scriptures
+-- ------------------------------------------------------
+-- Server version	5.7.30-log
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
+/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
+/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
+/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+
+--
+-- Table structure for table `books`
+--
+
+DROP TABLE IF EXISTS `books`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `books` (
+  `id` int(10) unsigned NOT NULL,
+  `volume_id` int(10) unsigned NOT NULL,
+  `book_title` varchar(22) NOT NULL,
+  `book_long_title` varchar(59) NOT NULL,
+  `book_subtitle` varchar(80) NOT NULL,
+  `book_short_title` varchar(8) NOT NULL,
+  `book_lds_url` varchar(255) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `volume_id` (`volume_id`),
+  CONSTRAINT `books_ibfk_1` FOREIGN KEY (`volume_id`) REFERENCES `volumes` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `chapters`
+--
+
+DROP TABLE IF EXISTS `chapters`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `chapters` (
+  `id` int(10) unsigned NOT NULL,
+  `book_id` int(10) unsigned NOT NULL DEFAULT '0',
+  `chapter_number` smallint(5) unsigned NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`),
+  KEY `book_id` (`book_id`),
+  CONSTRAINT `chapters_ibfk_1` FOREIGN KEY (`book_id`) REFERENCES `books` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Temporary table structure for view `scriptures`
+--
+
+DROP TABLE IF EXISTS `scriptures`;
+/*!50001 DROP VIEW IF EXISTS `scriptures`*/;
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
+/*!50001 CREATE VIEW `scriptures` AS SELECT 
+ 1 AS `volume_id`,
+ 1 AS `book_id`,
+ 1 AS `chapter_id`,
+ 1 AS `verse_id`,
+ 1 AS `volume_title`,
+ 1 AS `book_title`,
+ 1 AS `volume_long_title`,
+ 1 AS `book_long_title`,
+ 1 AS `volume_subtitle`,
+ 1 AS `book_subtitle`,
+ 1 AS `volume_short_title`,
+ 1 AS `book_short_title`,
+ 1 AS `volume_lds_url`,
+ 1 AS `book_lds_url`,
+ 1 AS `chapter_number`,
+ 1 AS `verse_number`,
+ 1 AS `scripture_text`,
+ 1 AS `verse_title`,
+ 1 AS `verse_short_title`*/;
+SET character_set_client = @saved_cs_client;
+
+--
+-- Table structure for table `verses`
+--
+
+DROP TABLE IF EXISTS `verses`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `verses` (
+  `id` int(10) unsigned NOT NULL,
+  `chapter_id` int(10) unsigned NOT NULL DEFAULT '0',
+  `verse_number` int(10) unsigned NOT NULL DEFAULT '0',
+  `scripture_text` text NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `chapter_id` (`chapter_id`),
+  CONSTRAINT `verses_ibfk_1` FOREIGN KEY (`chapter_id`) REFERENCES `chapters` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `volumes`
+--
+
+DROP TABLE IF EXISTS `volumes`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `volumes` (
+  `id` int(10) unsigned NOT NULL,
+  `volume_title` varchar(22) NOT NULL,
+  `volume_long_title` varchar(26) NOT NULL,
+  `volume_subtitle` varchar(36) NOT NULL,
+  `volume_short_title` varchar(3) NOT NULL,
+  `volume_lds_url` varchar(12) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Final view structure for view `scriptures`
+--
+
+/*!50001 DROP VIEW IF EXISTS `scriptures`*/;
+/*!50001 SET @saved_cs_client          = @@character_set_client */;
+/*!50001 SET @saved_cs_results         = @@character_set_results */;
+/*!50001 SET @saved_col_connection     = @@collation_connection */;
+/*!50001 SET character_set_client      = utf8 */;
+/*!50001 SET character_set_results     = utf8 */;
+/*!50001 SET collation_connection      = utf8_general_ci */;
+/*!50001 CREATE ALGORITHM=UNDEFINED */
+/*!50013 DEFINER=`root`@`localhost` SQL SECURITY DEFINER */
+/*!50001 VIEW `scriptures` AS select `volumes`.`id` AS `volume_id`,`books`.`id` AS `book_id`,`chapters`.`id` AS `chapter_id`,`verses`.`id` AS `verse_id`,`volumes`.`volume_title` AS `volume_title`,`books`.`book_title` AS `book_title`,`volumes`.`volume_long_title` AS `volume_long_title`,`books`.`book_long_title` AS `book_long_title`,`volumes`.`volume_subtitle` AS `volume_subtitle`,`books`.`book_subtitle` AS `book_subtitle`,`volumes`.`volume_short_title` AS `volume_short_title`,`books`.`book_short_title` AS `book_short_title`,`volumes`.`volume_lds_url` AS `volume_lds_url`,`books`.`book_lds_url` AS `book_lds_url`,`chapters`.`chapter_number` AS `chapter_number`,`verses`.`verse_number` AS `verse_number`,`verses`.`scripture_text` AS `scripture_text`,concat(`books`.`book_title`,' ',`chapters`.`chapter_number`,':',`verses`.`verse_number`) AS `verse_title`,concat(`books`.`book_short_title`,' ',`chapters`.`chapter_number`,':',`verses`.`verse_number`) AS `verse_short_title` from (((`volumes` join `books` on((`books`.`volume_id` = `volumes`.`id`))) join `chapters` on((`chapters`.`book_id` = `books`.`id`))) join `verses` on((`verses`.`chapter_id` = `chapters`.`id`))) order by `volumes`.`id`,`books`.`id`,`chapters`.`id`,`verses`.`id` */;
+/*!50001 SET character_set_client      = @saved_cs_client */;
+/*!50001 SET character_set_results     = @saved_cs_results */;
+/*!50001 SET collation_connection      = @saved_col_connection */;
+/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
+
+/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
+/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
+/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
+
+-- Dump completed on 2020-12-08 19:03:32
